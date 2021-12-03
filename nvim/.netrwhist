@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/Users/peter_maresca/Projects/aim-web/src/job/api3/tests'
+let g:netrw_dirhist_2='/Users/peter_maresca/Projects/aim-summary/src/config/settings'
+let g:netrw_dirhist_1='/Users/peter_maresca/.tmux'
+let g:netrw_dirhist_0='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web/utils'
+let g:netrw_dirhist_9='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web'
+let g:netrw_dirhist_8='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web/components'
+let g:netrw_dirhist_7='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web'
+let g:netrw_dirhist_6='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web/components/forms/BrandsLocation'
+let g:netrw_dirhist_5='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web/components/forms'
+let g:netrw_dirhist_4='/Users/peter_maresca/Trufan/official-repo/surf-app/surf-web/components'
