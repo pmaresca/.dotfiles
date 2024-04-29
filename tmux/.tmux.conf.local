@@ -39,6 +39,7 @@ tmux_conf_new_session_prompt=false
 
 
 # -- display -------------------------------------------------------------------
+set -g status-interval 3     # redraw status line every 10 seconds
 
 # RGB 24-bit colour support (tmux >= 2.2), possible values are:
 #  - true

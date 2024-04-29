@@ -1,8 +1,6 @@
 local execute = vim.api.nvim_command
 local fn = vim.fn
-
 local packer_install_dir = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-
 local plug_url_format = "https://github.com/%s"
 
 local packer_repo = string.format(plug_url_format, "wbthomason/packer.nvim")
@@ -41,12 +39,46 @@ return require("packer").startup(function(use)
   use("nvim-lualine/lualine.nvim")
   use("kyazdani42/nvim-web-devicons")
   -- Focus
-  use { "beauwilliams/focus.nvim", config = function() require("focus").setup() end }
+  use { "beauwilliams/focus.nvim", config = function() require("focus").setup(
+      {
+          enable = true, -- Enable module
+          commands = true, -- Create Focus commands
+          autoresize = {
+              enable = false, -- Enable or disable auto-resizing of splits
+              width = 0, -- Force width for the focused window
+              height = 0, -- Force height for the focused window
+              minwidth = 0, -- Force minimum width for the unfocused window
+              minheight = 0, -- Force minimum height for the unfocused window
+              height_quickfix = 10, -- Set the height of quickfix panel
+          },
+          split = {
+              bufnew = false, -- Create blank buffer for new split windows
+              tmux = false, -- Create tmux splits instead of neovim splits
+          },
+          ui = {
+              number = false, -- Display line numbers in the focussed window only
+              relativenumber = false, -- Display relative line numbers in the focussed window only
+              hybridnumber = false, -- Display hybrid line numbers in the focussed window only
+              absolutenumber_unfocussed = false, -- Preserve absolute numbers in the unfocussed windows
+
+              cursorline = true, -- Display a cursorline in the focussed window only
+              cursorcolumn = true, -- Display cursorcolumn in the focussed window only
+              colorcolumn = {
+                  enable = false, -- Display colorcolumn in the foccused window only
+                  list = '+1', -- Set the comma-separated list for the colorcolumn
+              },
+              signcolumn = true, -- Display signcolumn in the focussed window only
+              winhighlight = false, -- Auto highlighting for focussed/unfocussed windows
+          }
+      }
+  ) end }
   -- Harpoon
-  use({ "ThePrimeagen/harpoon", requires = { "nvim-lua/plenary.nvim", "nvim-lua/popup.nvim" } })
+  use({ "ThePrimeagen/harpoon", branch = "harpoon2", requires = { { "nvim-lua/plenary.nvim" } } })
   -- LSP Stuff
-  use("neovim/nvim-lspconfig")
+  use { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim", "WhoIsSethDaniel/mason-tool-installer.nvim", "neovim/nvim-lspconfig"}
   use("jose-elias-alvarez/nvim-lsp-ts-utils")
+  -- Linting Stuff
+  use("mfussenegger/nvim-lint")
   -- Telescopic Stuff
   use("onsails/lspkind-nvim")
   use({
@@ -60,18 +92,22 @@ return require("packer").startup(function(use)
 
   use({ "nvim-telescope/telescope.nvim", requires = { "nvim-lua/plenary.nvim", "nvim-lua/popup.nvim" } })
   use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" })
+  -- Debug adapter protocol
+  use "mfussenegger/nvim-dap"
+  use "rcarriga/nvim-dap-ui"
+  use "theHamsta/nvim-dap-virtual-text"
+  use "nvim-telescope/telescope-dap.nvim"
+  use "mfussenegger/nvim-dap-python"
   -- Nice formatting
   use("windwp/nvim-autopairs")
   use("lukas-reineke/indent-blankline.nvim")
-  -- js styling
-  use { "vim-scripts/JavaScript-Indent", ft = "javascript" }
-  use { "pangloss/vim-javascript", ft = { "javascript", "html" } }
   -- Treesitter
   use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
+  use {"https://github.com/apple/pkl-neovim", after = "nvim-treesitter", run = ":TSInstall! pkl"} -- Pkl syntax highlightin
   use("nvim-treesitter/playground")
-  -- Nice diagnostics
-  use("glepnir/lspsaga.nvim")
   use("simrat39/symbols-outline.nvim")
+  -- go to gh
+  use("almo7aya/openingh.nvim")
   -- Markdown Previewer
   use({ "iamcco/markdown-preview.nvim", run = "cd app && yarn install" })
   use({
@@ -149,16 +185,6 @@ return require("packer").startup(function(use)
       })
     end,
   })
-  -- use({
-  --   "jose-elias-alvarez/null-ls.nvim",
-  --   config = function()
-  --     require("null-ls").setup()
-  --   end,
-  --   requires = { "nvim-lua/plenary.nvim" },
-  -- })
-  -- Simple plugins can be specified as strings
-  -- use '9mm/vim-closer'
-
   -- Lazy loading:
   -- Load on specific commands
   -- use {'tpope/vim-dispatch', opt = true, cmd = {'Dispatch', 'Make', 'Focus', 'Start'}}

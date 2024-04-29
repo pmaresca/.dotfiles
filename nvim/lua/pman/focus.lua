@@ -1,8 +1,5 @@
-local focusmap = function(direction)
-    vim.api.nvim_set_keymap('n', '<Leader>'..direction, ":lua require'focus'.split_command('"..direction.."')<CR>", { silent = true })
-end
--- Use `<Leader>h` to split the screen to the left, same as command FocusSplitLeft etc
-focusmap('h')
-focusmap('j')
-focusmap('k')
-focusmap('l')
+vim.api.nvim_set_keymap('n', '<Leader>h', ":FocusSplitLeft<CR>", { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>l', ":FocusSplitRight<CR>", { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>j', ":FocusSplitDown<CR>", { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>k', ":FocusSplitUp<CR>", { silent = true })
+vim.api.nvim_set_keymap('n', '<Leader>=', ":FocusEqualise<CR>", { silent = true })

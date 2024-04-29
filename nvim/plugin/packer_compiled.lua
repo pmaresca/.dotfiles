@@ -9,23 +9,26 @@ vim.api.nvim_command('packadd packer.nvim')
 
 local no_errors, error_msg = pcall(function()
 
-  local time
-  local profile_info
-  local should_profile = false
-  if should_profile then
-    local hrtime = vim.loop.hrtime
-    profile_info = {}
-    time = function(chunk, start)
-      if start then
-        profile_info[chunk] = hrtime()
-      else
-        profile_info[chunk] = (hrtime() - profile_info[chunk]) / 1e6
-      end
+_G._packer = _G._packer or {}
+_G._packer.inside_compile = true
+
+local time
+local profile_info
+local should_profile = false
+if should_profile then
+  local hrtime = vim.loop.hrtime
+  profile_info = {}
+  time = function(chunk, start)
+    if start then
+      profile_info[chunk] = hrtime()
+    else
+      profile_info[chunk] = (hrtime() - profile_info[chunk]) / 1e6
     end
-  else
-    time = function(chunk, start) end
   end
-  
+else
+  time = function(chunk, start) end
+end
+
 local function save_profiles(threshold)
   local sorted_times = {}
   for chunk_name, time_taken in pairs(profile_info) do
@@ -38,14 +41,16 @@ local function save_profiles(threshold)
       results[i] = elem[1] .. ' took ' .. elem[2] .. 'ms'
     end
   end
+  if threshold then
+    table.insert(results, '(Only showing plugins that took longer than ' .. threshold .. ' ms ' .. 'to load)')
+  end
 
-  _G._packer = _G._packer or {}
   _G._packer.profile_output = results
 end
 
 time([[Luarocks path setup]], true)
-local package_path_str = "/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.0-beta3/share/lua/5.1/?.lua;/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.0-beta3/share/lua/5.1/?/init.lua;/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.0-beta3/lib/luarocks/rocks-5.1/?.lua;/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.0-beta3/lib/luarocks/rocks-5.1/?/init.lua"
-local install_cpath_pattern = "/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.0-beta3/lib/lua/5.1/?.so"
+local package_path_str = "/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.1703358377/share/lua/5.1/?.lua;/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.1703358377/share/lua/5.1/?/init.lua;/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.1703358377/lib/luarocks/rocks-5.1/?.lua;/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.1703358377/lib/luarocks/rocks-5.1/?/init.lua"
+local install_cpath_pattern = "/Users/peter_maresca/.cache/nvim/packer_hererocks/2.1.1703358377/lib/lua/5.1/?.so"
 if not string.find(package.path, package_path_str, 1, true) then
   package.path = package.path .. ';' .. package_path_str
 end
@@ -69,13 +74,6 @@ end
 time([[try_loadstring definition]], false)
 time([[Defining packer_plugins]], true)
 _G.packer_plugins = {
-  ["JavaScript-Indent"] = {
-    loaded = false,
-    needs_bufread = false,
-    only_cond = false,
-    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/JavaScript-Indent",
-    url = "https://github.com/vim-scripts/JavaScript-Indent"
-  },
   ["cmp-buffer"] = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/cmp-buffer",
@@ -110,7 +108,7 @@ _G.packer_plugins = {
     url = "https://github.com/tjdevries/colorbuddy.nvim"
   },
   ["focus.nvim"] = {
-    config = { "\27LJ\2\n3\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\nfocus\frequire\0" },
+    config = { "\27LJ\2\ní\2\0\0\5\0\f\0\0156\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0005\3\4\0=\3\5\0025\3\6\0=\3\a\0025\3\b\0005\4\t\0=\4\n\3=\3\v\2B\0\2\1K\0\1\0\aui\16colorcolumn\1\0\2\tlist\a+1\venable\1\1\0\b\17winhighlight\1\15signcolumn\2\17cursorcolumn\2\15cursorline\2\30absolutenumber_unfocussed\1\17hybridnumber\1\19relativenumber\1\vnumber\1\nsplit\1\0\2\ttmux\1\vbufnew\1\15autoresize\1\0\6\20height_quickfix\3\n\14minheight\3\0\rminwidth\3\0\vheight\3\0\nwidth\3\0\venable\1\1\0\2\rcommands\2\venable\2\nsetup\nfocus\frequire\0" },
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/focus.nvim",
     url = "https://github.com/beauwilliams/focus.nvim"
@@ -140,11 +138,6 @@ _G.packer_plugins = {
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/lspkind-nvim",
     url = "https://github.com/onsails/lspkind-nvim"
   },
-  ["lspsaga.nvim"] = {
-    loaded = true,
-    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/lspsaga.nvim",
-    url = "https://github.com/glepnir/lspsaga.nvim"
-  },
   ["lualine.nvim"] = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/lualine.nvim",
@@ -154,6 +147,21 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/markdown-preview.nvim",
     url = "https://github.com/iamcco/markdown-preview.nvim"
+  },
+  ["mason-lspconfig.nvim"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/mason-lspconfig.nvim",
+    url = "https://github.com/williamboman/mason-lspconfig.nvim"
+  },
+  ["mason-tool-installer.nvim"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/mason-tool-installer.nvim",
+    url = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim"
+  },
+  ["mason.nvim"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/mason.nvim",
+    url = "https://github.com/williamboman/mason.nvim"
   },
   ["material.nvim"] = {
     loaded = true,
@@ -169,6 +177,31 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-cmp",
     url = "https://github.com/hrsh7th/nvim-cmp"
+  },
+  ["nvim-dap"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-dap",
+    url = "https://github.com/mfussenegger/nvim-dap"
+  },
+  ["nvim-dap-python"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-dap-python",
+    url = "https://github.com/mfussenegger/nvim-dap-python"
+  },
+  ["nvim-dap-ui"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-dap-ui",
+    url = "https://github.com/rcarriga/nvim-dap-ui"
+  },
+  ["nvim-dap-virtual-text"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-dap-virtual-text",
+    url = "https://github.com/theHamsta/nvim-dap-virtual-text"
+  },
+  ["nvim-lint"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-lint",
+    url = "https://github.com/mfussenegger/nvim-lint"
   },
   ["nvim-lsp-ts-utils"] = {
     loaded = true,
@@ -190,10 +223,22 @@ _G.packer_plugins = {
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/nvim-web-devicons",
     url = "https://github.com/kyazdani42/nvim-web-devicons"
   },
+  ["openingh.nvim"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/openingh.nvim",
+    url = "https://github.com/almo7aya/openingh.nvim"
+  },
   ["packer.nvim"] = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/packer.nvim",
     url = "https://github.com/wbthomason/packer.nvim"
+  },
+  ["pkl-neovim"] = {
+    load_after = {},
+    loaded = true,
+    needs_bufread = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/pkl-neovim",
+    url = "https://github.com/apple/pkl-neovim"
   },
   playground = {
     loaded = true,
@@ -227,6 +272,11 @@ _G.packer_plugins = {
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/symbols-outline.nvim",
     url = "https://github.com/simrat39/symbols-outline.nvim"
   },
+  ["telescope-dap.nvim"] = {
+    loaded = true,
+    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/telescope-dap.nvim",
+    url = "https://github.com/nvim-telescope/telescope-dap.nvim"
+  },
   ["telescope-fzf-native.nvim"] = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/telescope-fzf-native.nvim",
@@ -247,13 +297,6 @@ _G.packer_plugins = {
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/vim-fugitive",
     url = "https://github.com/tpope/vim-fugitive"
   },
-  ["vim-javascript"] = {
-    loaded = false,
-    needs_bufread = true,
-    only_cond = false,
-    path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript",
-    url = "https://github.com/pangloss/vim-javascript"
-  },
   ["vim-sensible"] = {
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/vim-sensible",
@@ -265,7 +308,7 @@ _G.packer_plugins = {
     url = "https://github.com/tpope/vim-surround"
   },
   ["which-key.nvim"] = {
-    config = { "\27LJ\2\ný\5\0\0\6\0%\0+6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\3\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\0035\4\n\0=\4\v\0034\4\0\0=\4\f\0035\4\r\0=\4\14\0035\4\15\0=\4\16\0035\4\17\0005\5\18\0=\5\19\0045\5\20\0=\5\21\4=\4\22\0035\4\24\0005\5\23\0=\5\25\0045\5\26\0=\5\27\4=\4\28\0035\4\29\0=\4\30\0035\4 \0005\5\31\0=\5!\0045\5\"\0=\5#\4=\4$\3>\3\1\2B\0\2\1K\0\1\0\23triggers_blacklist\6v\1\3\0\0\6j\6k\6i\1\0\0\1\3\0\0\6j\6k\vhidden\1\t\0\0\r<silent>\n<cmd>\n<Cmd>\t<CR>\tcall\blua\a^:\a^ \vlayout\nwidth\1\0\2\bmax\0032\bmin\3\20\vheight\1\0\2\nalign\tleft\fspacing\3\3\1\0\2\bmax\3\25\bmin\3\4\vwindow\fpadding\1\5\0\0\3\2\3\2\3\2\3\2\vmargin\1\5\0\0\3\1\3\0\3\1\3\0\1\0\3\rwinblend\3\0\rposition\vbottom\vborder\tnone\19popup_mappings\1\0\2\16scroll_down\n<c-d>\14scroll_up\n<c-u>\nicons\1\0\3\ngroup\6+\14separator\bâžœ\15breadcrumb\aÂ»\15key_labels\14operators\1\0\1\agc\rComments\fplugins\1\0\3\19ignore_missing\1\rtriggers\tauto\14show_help\2\fpresets\1\0\a\fmotions\2\14operators\2\6g\2\6z\2\bnav\2\fwindows\2\17text_objects\2\rspelling\1\0\2\fenabled\1\16suggestions\3\20\1\0\2\14registers\2\nmarks\1\nsetup\14which-key\frequire\0" },
+    config = { "\27LJ\2\ný\5\0\0\6\0%\0+6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\3\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\0035\4\n\0=\4\v\0034\4\0\0=\4\f\0035\4\r\0=\4\14\0035\4\15\0=\4\16\0035\4\17\0005\5\18\0=\5\19\0045\5\20\0=\5\21\4=\4\22\0035\4\24\0005\5\23\0=\5\25\0045\5\26\0=\5\27\4=\4\28\0035\4\29\0=\4\30\0035\4 \0005\5\31\0=\5!\0045\5\"\0=\5#\4=\4$\3>\3\1\2B\0\2\1K\0\1\0\23triggers_blacklist\6v\1\3\0\0\6j\6k\6i\1\0\0\1\3\0\0\6j\6k\vhidden\1\t\0\0\r<silent>\n<cmd>\n<Cmd>\t<CR>\tcall\blua\a^:\a^ \vlayout\nwidth\1\0\2\bmax\0032\bmin\3\20\vheight\1\0\2\nalign\tleft\fspacing\3\3\1\0\2\bmax\3\25\bmin\3\4\vwindow\fpadding\1\5\0\0\3\2\3\2\3\2\3\2\vmargin\1\5\0\0\3\1\3\0\3\1\3\0\1\0\3\rwinblend\3\0\rposition\vbottom\vborder\tnone\19popup_mappings\1\0\2\16scroll_down\n<c-d>\14scroll_up\n<c-u>\nicons\1\0\3\15breadcrumb\aÂ»\14separator\bâžœ\ngroup\6+\15key_labels\14operators\1\0\1\agc\rComments\fplugins\1\0\3\19ignore_missing\1\rtriggers\tauto\14show_help\2\fpresets\1\0\a\17text_objects\2\fmotions\2\14operators\2\6g\2\6z\2\bnav\2\fwindows\2\rspelling\1\0\2\16suggestions\3\20\fenabled\1\1\0\2\nmarks\1\14registers\2\nsetup\14which-key\frequire\0" },
     loaded = true,
     path = "/Users/peter_maresca/.local/share/nvim/site/pack/packer/start/which-key.nvim",
     url = "https://github.com/folke/which-key.nvim"
@@ -280,19 +323,22 @@ _G.packer_plugins = {
 time([[Defining packer_plugins]], false)
 -- Config for: which-key.nvim
 time([[Config for which-key.nvim]], true)
-try_loadstring("\27LJ\2\ný\5\0\0\6\0%\0+6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\3\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\0035\4\n\0=\4\v\0034\4\0\0=\4\f\0035\4\r\0=\4\14\0035\4\15\0=\4\16\0035\4\17\0005\5\18\0=\5\19\0045\5\20\0=\5\21\4=\4\22\0035\4\24\0005\5\23\0=\5\25\0045\5\26\0=\5\27\4=\4\28\0035\4\29\0=\4\30\0035\4 \0005\5\31\0=\5!\0045\5\"\0=\5#\4=\4$\3>\3\1\2B\0\2\1K\0\1\0\23triggers_blacklist\6v\1\3\0\0\6j\6k\6i\1\0\0\1\3\0\0\6j\6k\vhidden\1\t\0\0\r<silent>\n<cmd>\n<Cmd>\t<CR>\tcall\blua\a^:\a^ \vlayout\nwidth\1\0\2\bmax\0032\bmin\3\20\vheight\1\0\2\nalign\tleft\fspacing\3\3\1\0\2\bmax\3\25\bmin\3\4\vwindow\fpadding\1\5\0\0\3\2\3\2\3\2\3\2\vmargin\1\5\0\0\3\1\3\0\3\1\3\0\1\0\3\rwinblend\3\0\rposition\vbottom\vborder\tnone\19popup_mappings\1\0\2\16scroll_down\n<c-d>\14scroll_up\n<c-u>\nicons\1\0\3\ngroup\6+\14separator\bâžœ\15breadcrumb\aÂ»\15key_labels\14operators\1\0\1\agc\rComments\fplugins\1\0\3\19ignore_missing\1\rtriggers\tauto\14show_help\2\fpresets\1\0\a\fmotions\2\14operators\2\6g\2\6z\2\bnav\2\fwindows\2\17text_objects\2\rspelling\1\0\2\fenabled\1\16suggestions\3\20\1\0\2\14registers\2\nmarks\1\nsetup\14which-key\frequire\0", "config", "which-key.nvim")
+try_loadstring("\27LJ\2\ný\5\0\0\6\0%\0+6\0\0\0'\2\1\0B\0\2\0029\0\2\0004\2\3\0005\3\b\0005\4\3\0005\5\4\0=\5\5\0045\5\6\0=\5\a\4=\4\t\0035\4\n\0=\4\v\0034\4\0\0=\4\f\0035\4\r\0=\4\14\0035\4\15\0=\4\16\0035\4\17\0005\5\18\0=\5\19\0045\5\20\0=\5\21\4=\4\22\0035\4\24\0005\5\23\0=\5\25\0045\5\26\0=\5\27\4=\4\28\0035\4\29\0=\4\30\0035\4 \0005\5\31\0=\5!\0045\5\"\0=\5#\4=\4$\3>\3\1\2B\0\2\1K\0\1\0\23triggers_blacklist\6v\1\3\0\0\6j\6k\6i\1\0\0\1\3\0\0\6j\6k\vhidden\1\t\0\0\r<silent>\n<cmd>\n<Cmd>\t<CR>\tcall\blua\a^:\a^ \vlayout\nwidth\1\0\2\bmax\0032\bmin\3\20\vheight\1\0\2\nalign\tleft\fspacing\3\3\1\0\2\bmax\3\25\bmin\3\4\vwindow\fpadding\1\5\0\0\3\2\3\2\3\2\3\2\vmargin\1\5\0\0\3\1\3\0\3\1\3\0\1\0\3\rwinblend\3\0\rposition\vbottom\vborder\tnone\19popup_mappings\1\0\2\16scroll_down\n<c-d>\14scroll_up\n<c-u>\nicons\1\0\3\15breadcrumb\aÂ»\14separator\bâžœ\ngroup\6+\15key_labels\14operators\1\0\1\agc\rComments\fplugins\1\0\3\19ignore_missing\1\rtriggers\tauto\14show_help\2\fpresets\1\0\a\17text_objects\2\fmotions\2\14operators\2\6g\2\6z\2\bnav\2\fwindows\2\rspelling\1\0\2\16suggestions\3\20\fenabled\1\1\0\2\nmarks\1\14registers\2\nsetup\14which-key\frequire\0", "config", "which-key.nvim")
 time([[Config for which-key.nvim]], false)
 -- Config for: focus.nvim
 time([[Config for focus.nvim]], true)
-try_loadstring("\27LJ\2\n3\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\nfocus\frequire\0", "config", "focus.nvim")
+try_loadstring("\27LJ\2\ní\2\0\0\5\0\f\0\0156\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0005\3\4\0=\3\5\0025\3\6\0=\3\a\0025\3\b\0005\4\t\0=\4\n\3=\3\v\2B\0\2\1K\0\1\0\aui\16colorcolumn\1\0\2\tlist\a+1\venable\1\1\0\b\17winhighlight\1\15signcolumn\2\17cursorcolumn\2\15cursorline\2\30absolutenumber_unfocussed\1\17hybridnumber\1\19relativenumber\1\vnumber\1\nsplit\1\0\2\ttmux\1\vbufnew\1\15autoresize\1\0\6\20height_quickfix\3\n\14minheight\3\0\rminwidth\3\0\vheight\3\0\nwidth\3\0\venable\1\1\0\2\rcommands\2\venable\2\nsetup\nfocus\frequire\0", "config", "focus.nvim")
 time([[Config for focus.nvim]], false)
+-- Load plugins in order defined by `after`
+time([[Sequenced loading]], true)
+vim.cmd [[ packadd nvim-treesitter ]]
+vim.cmd [[ packadd pkl-neovim ]]
+time([[Sequenced loading]], false)
 vim.cmd [[augroup packer_load_aucmds]]
 vim.cmd [[au!]]
   -- Filetype lazy-loads
 time([[Defining lazy-load filetype autocommands]], true)
-vim.cmd [[au FileType html ++once lua require("packer.load")({'vim-javascript'}, { ft = "html" }, _G.packer_plugins)]]
 vim.cmd [[au FileType rust ++once lua require("packer.load")({'rust.vim'}, { ft = "rust" }, _G.packer_plugins)]]
-vim.cmd [[au FileType javascript ++once lua require("packer.load")({'JavaScript-Indent', 'vim-javascript'}, { ft = "javascript" }, _G.packer_plugins)]]
 time([[Defining lazy-load filetype autocommands]], false)
   -- Event lazy-loads
 time([[Defining lazy-load event autocommands]], true)
@@ -303,13 +349,14 @@ vim.cmd [[augroup filetypedetect]]
 time([[Sourcing ftdetect script at: /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim]], true)
 vim.cmd [[source /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim]]
 time([[Sourcing ftdetect script at: /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/rust.vim/ftdetect/rust.vim]], false)
-time([[Sourcing ftdetect script at: /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript/ftdetect/flow.vim]], true)
-vim.cmd [[source /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript/ftdetect/flow.vim]]
-time([[Sourcing ftdetect script at: /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript/ftdetect/flow.vim]], false)
-time([[Sourcing ftdetect script at: /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript/ftdetect/javascript.vim]], true)
-vim.cmd [[source /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript/ftdetect/javascript.vim]]
-time([[Sourcing ftdetect script at: /Users/peter_maresca/.local/share/nvim/site/pack/packer/opt/vim-javascript/ftdetect/javascript.vim]], false)
 vim.cmd("augroup END")
+
+_G._packer.inside_compile = false
+if _G._packer.needs_bufread == true then
+  vim.cmd("doautocmd BufRead")
+end
+_G._packer.needs_bufread = false
+
 if should_profile then save_profiles() end
 
 end)
